@@ -5,6 +5,19 @@ server:
 spring:
   application:
     name: ai-agent
+  profiles:
+    active: default
+  ai:
+    dashscope:
+      api-key: xxx
+      chat:
+        options:
+          model: deepseek-r1
+#    ollama:
+#      base-url: http://localhost:11434
+#      chat:
+#        model: llama3
+
 # springdoc-openapi ????
 springdoc:
   swagger-ui:
@@ -17,7 +30,7 @@ springdoc:
     - group: 'default'
       paths-to-match: '/**'
       packages-to-scan: com.belly.aiagent.controller
-# knife4j???????????????
+# knife4j的增强配置，不需要增强可以不配
 knife4j:
   enable: true
   setting:
