@@ -1,5 +1,6 @@
 package com.belly.aiagent.demo;
 
+import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +20,7 @@ public class TestChat implements CommandLineRunner {
 
     // deepSeekChat模型
     @Autowired(required = false)
-    @Qualifier("dashScopeChatModel")
-    private ChatModel deepSeekChatModel;
+    private DashScopeChatModel deepSeekChatModel;
     public String ollamaChat() {
         if (null == ollamaChatModel) {
             return "ollamaChatModel is null";

@@ -1,7 +1,7 @@
 package com.belly.aiagent.controller;
 
 import com.belly.aiagent.demo.TestChat;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 时间 18:32
  */
 @RestController("/test")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TestController {
     private final TestChat testChat;
 
