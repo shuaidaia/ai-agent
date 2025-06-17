@@ -1,12 +1,15 @@
 package com.belly.aiagent.demo;
 
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 
 /**
  * 测试AI模型接口
@@ -18,9 +21,9 @@ public class TestChat implements CommandLineRunner {
     @Qualifier("ollamaChatModel")
     private ChatModel ollamaChatModel;
 
-    // deepSeekChat模型
+    // DashScope灵积
     @Autowired(required = false)
-    private DashScopeChatModel deepSeekChatModel;
+    private DashScopeChatModel chatModel;
     public String ollamaChat() {
         if (null == ollamaChatModel) {
             return "ollamaChatModel is null";
@@ -29,14 +32,24 @@ public class TestChat implements CommandLineRunner {
     }
 
     public String deepSeekChat(String prompt) {
-        if (null == deepSeekChatModel) {
+        if (null == chatModel) {
             return "dashScopeChatModel is null";
         }
-        return deepSeekChatModel.call(new Prompt(prompt)).getResult().getOutput().getText();
+        return chatModel.call(new Prompt(prompt)).getResult().getOutput().getText();
+    }
+
+    public Flux<String> streamChat(HttpServletResponse response, String prompt) {
+        if (null == chatModel) {
+            return Flux.just("dashScopeChatModel is null");
+        }
+        // 避免返回乱码
+        response.setCharacterEncoding("UTF-8");
+        Flux<ChatResponse> stream = chatModel.stream(new Prompt(prompt));
+        return stream.map(resp -> resp.getResult().getOutput().getText());
     }
 
     @Override
     public void run(String... args) throws Exception {
-        System.out.println("嘻嘻嘻嘻");
+        System.out.println("测试启动咯~~~~~");
     }
 }
