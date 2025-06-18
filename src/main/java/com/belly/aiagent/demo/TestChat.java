@@ -1,7 +1,10 @@
 package com.belly.aiagent.demo;
 
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatModel;
+import com.belly.aiagent.advisor.MyLoggerAdvisor;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -15,6 +18,7 @@ import reactor.core.publisher.Flux;
  * 测试AI模型接口
  */
 @Component
+@Slf4j
 public class TestChat implements CommandLineRunner {
     // ollama模型
     @Autowired(required = false)
@@ -24,6 +28,8 @@ public class TestChat implements CommandLineRunner {
     // DashScope灵积
     @Autowired(required = false)
     private DashScopeChatModel chatModel;
+
+    private ChatClient chatClient;
     public String ollamaChat() {
         if (null == ollamaChatModel) {
             return "ollamaChatModel is null";
@@ -48,8 +54,24 @@ public class TestChat implements CommandLineRunner {
         return stream.map(resp -> resp.getResult().getOutput().getText());
     }
 
+    public Flux<String> streamChatClient(HttpServletResponse response, String prompt) {
+        if (null == chatModel && null == chatClient) {
+            return Flux.just("dashScopeChatModel is null");
+        }
+        // 避免返回乱码
+        response.setCharacterEncoding("UTF-8");
+        return chatClient.prompt(new Prompt(prompt)).stream().content();
+    }
+
     @Override
     public void run(String... args) throws Exception {
-        System.out.println("测试启动咯~~~~~");
+        log.info("测试启动咯~~~~~");
+        if (chatModel != null) {
+            chatClient = ChatClient.builder(chatModel).defaultAdvisors(new MyLoggerAdvisor()).build();
+            log.info("大模型 [{}] 已启动...", chatModel.getDefaultOptions().getModel());
+        }
+        if (ollamaChatModel != null) {
+            log.info("大模型 [{}] 已启动...", ollamaChatModel.getDefaultOptions().getModel());
+        }
     }
 }
