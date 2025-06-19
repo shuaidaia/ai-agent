@@ -19,6 +19,10 @@ spring:
 #      chat:
 #        model: llama3
 
+# searchApi
+search-api:
+  api-key: xxx
+
 # springdoc-openapi ????
 springdoc:
   swagger-ui:
