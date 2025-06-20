@@ -3,8 +3,15 @@ package com.belly.aiagent.advisor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.ai.chat.client.advisor.api.*;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.metadata.ChatResponseMetadata;
+import org.springframework.ai.chat.metadata.Usage;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.MessageAggregator;
 import reactor.core.publisher.Flux;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 自定义日志 Advisor
@@ -30,11 +37,28 @@ public class MyLoggerAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
     }
 
     private void observeAfter(AdvisedResponse advisedResponse) {
-        if (null == advisedResponse.response()) {
+        ChatResponse response = advisedResponse.response();
+        if (null == response) {
             log.info("AI Response is null");
             return;
         }
-        log.info("AI Response: {}", advisedResponse.response().getResult().getOutput().getText());
+        ChatResponseMetadata responseMetadata = response.getMetadata();
+        // 输出使用的tokens数
+        Usage usage = responseMetadata.getUsage();
+        log.info("已使用的总tokens数：{}", usage.getTotalTokens());
+        log.info("输入的tokens数：{}", usage.getPromptTokens());
+        log.info("输出的tokens数：{}", usage.getCompletionTokens());
+        AssistantMessage assistantMessage = response.getResult().getOutput();
+        List<AssistantMessage.ToolCall> toolCallList = assistantMessage.getToolCalls();
+        // 输出提示信息
+        String result = assistantMessage.getText();
+        log.info("问题：{}", result);
+        log.info("选择了 [{}] 个工具来使用", toolCallList.size());
+        String toolCallInfo = toolCallList.stream()
+                .map(toolCall -> String.format("工具名称：%s，参数：%s", toolCall.name(), toolCall.arguments()))
+                .collect(Collectors.joining("\n"));
+        log.info(toolCallInfo);
+        log.info("AI Response: {}", assistantMessage.getText());
     }
 
     @NotNull

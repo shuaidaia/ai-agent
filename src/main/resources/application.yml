@@ -12,12 +12,12 @@ spring:
       api-key: xxx
       chat:
         options:
-          model: qwq-plus
+          model: qwen-plus
           stream: true
 #    ollama:
 #      base-url: http://localhost:11434
 #      chat:
-#        model: llama3
+#        model: ollama3
 
 # searchApi
 search-api:

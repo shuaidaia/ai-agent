@@ -36,4 +36,9 @@ public class TestController {
 //        return testChat.streamChat(response, prompt);
         return testChat.streamChatClient(response, prompt);
     }
+
+    @RequestMapping("/chat/tools")
+    public String chatByTools(String prompt, HttpServletResponse response) {
+        return testChat.streamChatClientByTools(response, prompt);
+    }
 }
